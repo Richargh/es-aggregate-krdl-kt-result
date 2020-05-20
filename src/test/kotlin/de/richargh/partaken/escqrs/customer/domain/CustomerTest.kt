@@ -98,6 +98,25 @@ class CustomerTest {
     }
 
     @Test
+    fun `Unconfirmed Customer can change his email and must confirm the change`() {
+        val I = I()
+        // given
+        val oldHash = ConfirmationHash("old")
+        val testling = I.haveA.customer { makeUnConfirmed(oldHash) }
+
+        val newHash = ConfirmationHash("new")
+        testling.handle(I.wantTo.changeCustomerEmail { withConfirmationHash(newHash) })
+        val cmd = I.wantTo.confirmCustomerEmail { withConfirmationHash(newHash) }
+
+        // when
+        testling.handle(cmd)
+
+        // then
+        val result = testling.notYetPersistedEvents.filterIsInstance<CustomerEmailConfirmed>().last()
+        assertThat(result.confirmationHash).isEqualTo(newHash)
+    }
+
+    @Test
     fun `Confirmed Customer can change his email and must confirm the change`() {
         val I = I()
         // given
