@@ -1,4 +1,4 @@
-package de.richargh.partaken.escqrs
+package de.richargh.partaken.escqrs.basictypes.domain
 
 interface Entity {
     val id: Id

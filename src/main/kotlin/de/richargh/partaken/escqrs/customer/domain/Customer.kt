@@ -1,4 +1,7 @@
-package de.richargh.partaken.escqrs
+package de.richargh.partaken.escqrs.customer.domain
+
+import de.richargh.partaken.escqrs.basictypes.domain.Id
+import de.richargh.partaken.escqrs.basictypes.domain.*
 
 data class CustomerId(val rawValue: String): Id
 
@@ -15,6 +18,7 @@ data class Customer private constructor(override val id: CustomerId): Aggregate 
             is CustomerRegistered -> {
                 name = event.name
                 email = event.email
+                events.add(event)
             }
         }
     }

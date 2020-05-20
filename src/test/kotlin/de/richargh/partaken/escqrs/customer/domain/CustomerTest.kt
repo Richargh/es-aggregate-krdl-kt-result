@@ -1,5 +1,6 @@
-package de.richargh.partaken.escqrs
+package de.richargh.partaken.escqrs.customer.domain
 
+import de.richargh.partaken.escqrs.integrating.domain_builder.I
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
@@ -40,4 +41,3 @@ class CustomerTest {
 
     }
 }
-
