@@ -14,4 +14,10 @@ class RegisterCustomer(
         val confirmationHash: ConfirmationHash): CustomerCommand
 
 class ConfirmCustomerEmail(
+        val id: CustomerId,
         val confirmationHash: ConfirmationHash): CustomerCommand
+
+class ChangeCustomerEmail(
+        val id: CustomerId,
+        val confirmationHash: ConfirmationHash,
+        val email: Email): CustomerCommand

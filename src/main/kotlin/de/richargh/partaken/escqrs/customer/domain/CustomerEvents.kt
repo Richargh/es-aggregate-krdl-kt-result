@@ -14,7 +14,13 @@ class CustomerRegistered(
         val confirmationHash: ConfirmationHash): CustomerEvent
 
 class CustomerEmailConfirmed(
+        val id: CustomerId,
         val confirmationHash: ConfirmationHash): CustomerEvent
 
 class CustomerEmailConfirmationFailed(
+        val id: CustomerId,
+        val confirmationHash: ConfirmationHash): CustomerEvent
+
+class CustomerEmailAddressChanged(
+        val id: CustomerId,
         val confirmationHash: ConfirmationHash): CustomerEvent

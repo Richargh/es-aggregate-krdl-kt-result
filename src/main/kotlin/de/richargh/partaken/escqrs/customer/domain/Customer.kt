@@ -11,38 +11,51 @@ sealed class CustomerState {
 }
 
 data class Customer(
-        override val id: CustomerId,
-        private var state: CustomerState = CustomerState.UNCONFIRMED,
-        private var name: Name = Name.NULL,
-        private var email: Email = Email.NULL): Aggregate {
+        override val id: CustomerId): Aggregate {
 
     private val events: MutableList<CustomerEvent> = mutableListOf()
-    val recordedEvents: List<CustomerEvent> get() = events
+    val notYetPersistedEvents: List<CustomerEvent> get() = events
 
-    fun apply(events: List<CustomerEvent>) {
-        events.forEach(::apply)
+    private var state: CustomerState = CustomerState.UNCONFIRMED
+    private var name: Name = Name.NULL
+    private var email: Email = Email.NULL
+    private var lastConfirmationHash: ConfirmationHash? = null
+
+    fun reconstitute(events: List<CustomerEvent>) {
+        events.forEach(::reconstitute)
     }
-    fun apply(event: CustomerEvent) {
+
+    private fun reconstitute(event: CustomerEvent) = apply(event, false)
+    private fun record(event: CustomerEvent) = apply(event, true)
+    private fun apply(event: CustomerEvent, shouldAddEvent: Boolean) {
         when (event) {
-            is CustomerRegistered -> {
+            is CustomerRegistered              -> {
                 name = event.name
                 email = event.email
-                events.add(event)
+                lastConfirmationHash = event.confirmationHash
+                if (shouldAddEvent) events.add(event)
             }
-            is CustomerEmailConfirmed -> {
+            is CustomerEmailConfirmed          -> {
                 state = CustomerState.CONFIRMED
-                events.add(event)
+                lastConfirmationHash = null
+                if (shouldAddEvent) events.add(event)
             }
             is CustomerEmailConfirmationFailed -> {
-                events.add(event)
+                if (shouldAddEvent) events.add(event)
+            }
+            is CustomerEmailAddressChanged     -> {
+                state = CustomerState.UNCONFIRMED
+                lastConfirmationHash = event.confirmationHash
+                if (shouldAddEvent) events.add(event)
             }
         }
     }
 
     fun handle(command: CustomerCommand) {
         when (command) {
-            is RegisterCustomer -> registerCustomer(command).let(::apply)
-            is ConfirmCustomerEmail -> confirmCustomerEmail(command).value.let(::apply)
+            is RegisterCustomer     -> registerCustomer(command).let(::record)
+            is ConfirmCustomerEmail -> confirmCustomerEmail(command).value.let(::record)
+            is ChangeCustomerEmail  -> changeCustomerEmail(command).let(::record)
         }
     }
 
@@ -52,22 +65,26 @@ data class Customer(
         }
     }
 
-    private fun confirmCustomerEmail(cmd: ConfirmCustomerEmail): RelatedOutcome<CustomerEmailConfirmed, CustomerEmailConfirmationFailed, CustomerEvent> {
+    private fun confirmCustomerEmail(
+            cmd: ConfirmCustomerEmail): RelatedOutcome<CustomerEmailConfirmed, CustomerEmailConfirmationFailed, CustomerEvent> {
         return with(cmd) {
-            if(confirmationHash == events.filterIsInstance<CustomerRegistered>().lastOrNull()?.confirmationHash)
-                RelatedOutcome.Ok(CustomerEmailConfirmed(confirmationHash))
+            if (confirmationHash == lastConfirmationHash)
+                RelatedOutcome.Ok(CustomerEmailConfirmed(id, confirmationHash))
             else
-                RelatedOutcome.Fail(CustomerEmailConfirmationFailed(confirmationHash))
+                RelatedOutcome.Fail(CustomerEmailConfirmationFailed(id, confirmationHash))
+        }
+    }
+
+    private fun changeCustomerEmail(cmd: ChangeCustomerEmail): CustomerEmailAddressChanged {
+        return with(cmd) {
+            CustomerEmailAddressChanged(id, confirmationHash)
         }
     }
 
     companion object {
         fun register(cmd: RegisterCustomer): Customer {
             return Customer(
-                    cmd.id,
-                    CustomerState.UNCONFIRMED,
-                    Name.NULL,
-                    Email.NULL).apply {
+                    cmd.id).apply {
                 handle(cmd)
             }
         }

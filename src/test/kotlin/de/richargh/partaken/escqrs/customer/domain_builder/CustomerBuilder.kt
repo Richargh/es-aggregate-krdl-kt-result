@@ -10,16 +10,16 @@ class CustomerBuilder(customerBuilderContext: CustomerBuilderContext) {
     private var id = customerBuilderContext.id.nextCustomerId()
     private var name = Name("Benny")
     private var email = Email("blub@ben.de")
-    private var state: CustomerState = CustomerState.UNCONFIRMED
+
     private var events: List<CustomerEvent> = listOf(
             CustomerRegisteredBuilder(customerBuilderContext).build())
 
-    fun build() = Customer(id).apply { apply(events) }
+    fun build() = Customer(id).apply { reconstitute(events) }
 
-    fun makeConfirmed(confirmationHash: ConfirmationHash) = apply {
+    fun makeConfirmed(confirmationHash: ConfirmationHash = ConfirmationHash("bkla")) = apply {
         this.events = listOf(
                 CustomerRegistered(id, name, email, confirmationHash),
-                CustomerEmailConfirmed(confirmationHash))
+                CustomerEmailConfirmed(id, confirmationHash))
     }
     fun makeUnConfirmed(confirmationHash: ConfirmationHash) = apply {
         this.events = listOf(

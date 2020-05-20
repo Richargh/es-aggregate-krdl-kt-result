@@ -16,7 +16,7 @@ class CustomerTest {
         val testling = Customer.register(I.wantTo.registerCustomer())
 
         // then
-        val result = testling.recordedEvents
+        val result = testling.notYetPersistedEvents
         assertThat(result).hasSize(1)
         assertThat(result.single()).isInstanceOf(CustomerRegistered::class.java)
     }
@@ -31,7 +31,7 @@ class CustomerTest {
         val testling = Customer.register(cmd)
 
         // then
-        val result = testling.recordedEvents.filterIsInstance<CustomerRegistered>().first()
+        val result = testling.notYetPersistedEvents.filterIsInstance<CustomerRegistered>().first()
         assertThat(result.email).isEqualTo(cmd.email)
     }
 
@@ -45,7 +45,7 @@ class CustomerTest {
         val testling = Customer.register(cmd)
 
         // then
-        val result = testling.recordedEvents.filterIsInstance<CustomerRegistered>().first()
+        val result = testling.notYetPersistedEvents.filterIsInstance<CustomerRegistered>().first()
         assertThat(result.confirmationHash).isEqualTo(cmd.confirmationHash)
     }
 
@@ -54,14 +54,14 @@ class CustomerTest {
         val I = I()
         // given
         val rightHash = ConfirmationHash("right")
-        val testling = I.haveA.customer { makeConfirmed(rightHash) }
+        val testling = I.haveA.customer { makeUnConfirmed(rightHash) }
         val cmd = I.wantTo.confirmCustomerEmail { withConfirmationHash(rightHash) }
 
         // when
         testling.handle(cmd)
 
         // then
-        val result = testling.recordedEvents.filterIsInstance<CustomerEmailConfirmed>().firstOrNull()
+        val result = testling.notYetPersistedEvents.filterIsInstance<CustomerEmailConfirmed>().firstOrNull()
         assertThat(result).isNotNull
     }
 
@@ -78,8 +78,41 @@ class CustomerTest {
         testling.handle(cmd)
 
         // then
-        val result = testling.recordedEvents.filterIsInstance<CustomerEmailConfirmationFailed>().firstOrNull()
+        val result = testling.notYetPersistedEvents.filterIsInstance<CustomerEmailConfirmationFailed>().firstOrNull()
         assertThat(result).isNotNull
     }
 
+    @Test
+    fun `Customer can change his email`() {
+        val I = I()
+        // given
+        val testling = I.haveA.customer { makeConfirmed() }
+        val cmd = I.wantTo.changeCustomerEmail()
+
+        // when
+        testling.handle(cmd)
+
+        // then
+        val result = testling.notYetPersistedEvents.filterIsInstance<CustomerEmailAddressChanged>().firstOrNull()
+        assertThat(result).isNotNull
+    }
+
+    @Test
+    fun `Confirmed Customer can change his email and must confirm the change`() {
+        val I = I()
+        // given
+        val oldHash = ConfirmationHash("old")
+        val testling = I.haveA.customer { makeConfirmed(oldHash) }
+
+        val newHash = ConfirmationHash("new")
+        testling.handle(I.wantTo.changeCustomerEmail { withConfirmationHash(newHash) })
+        val cmd = I.wantTo.confirmCustomerEmail { withConfirmationHash(newHash) }
+
+        // when
+        testling.handle(cmd)
+
+        // then
+        val result = testling.notYetPersistedEvents.filterIsInstance<CustomerEmailConfirmed>().last()
+        assertThat(result.confirmationHash).isEqualTo(newHash)
+    }
 }
