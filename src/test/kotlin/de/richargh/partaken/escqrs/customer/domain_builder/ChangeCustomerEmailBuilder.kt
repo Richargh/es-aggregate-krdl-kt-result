@@ -16,6 +16,8 @@ class ChangeCustomerEmailBuilder(customerBuilderContext: CustomerBuilderContext)
             confirmationHash,
             email)
 
+    fun withEmail(email: Email) = apply { this.email = email }
+
     fun withConfirmationHash(confirmationHash: ConfirmationHash) = apply { this.confirmationHash = confirmationHash }
 
 }

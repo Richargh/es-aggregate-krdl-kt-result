@@ -23,4 +23,5 @@ class CustomerEmailConfirmationFailed(
 
 class CustomerEmailAddressChanged(
         val id: CustomerId,
+        val email: Email,
         val confirmationHash: ConfirmationHash): CustomerEvent

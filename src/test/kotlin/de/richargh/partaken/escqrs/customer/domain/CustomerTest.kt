@@ -1,6 +1,7 @@
 package de.richargh.partaken.escqrs.customer.domain
 
 import de.richargh.partaken.escqrs.basictypes.domain.ConfirmationHash
+import de.richargh.partaken.escqrs.basictypes.domain.Email
 import de.richargh.partaken.escqrs.integrating.application_builder.I
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -87,14 +88,15 @@ class CustomerTest {
         val I = I()
         // given
         val testling = I.haveA.customer { makeConfirmed() }
-        val cmd = I.wantTo.changeCustomerEmail()
+        val email = Email("dubb@blubb.io")
+        val cmd = I.wantTo.changeCustomerEmail { withEmail(email) }
 
         // when
         testling.handle(cmd)
 
         // then
-        val result = testling.notYetPersistedEvents.filterIsInstance<CustomerEmailAddressChanged>().firstOrNull()
-        assertThat(result).isNotNull
+        val result = testling.notYetPersistedEvents.filterIsInstance<CustomerEmailAddressChanged>().single()
+        assertThat(result.email).isEqualTo(email)
     }
 
     @Test

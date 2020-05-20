@@ -45,6 +45,7 @@ data class Customer(
             }
             is CustomerEmailAddressChanged     -> {
                 state = CustomerState.UNCONFIRMED
+                email = event.email
                 lastConfirmationHash = event.confirmationHash
                 if (shouldAddEvent) events.add(event)
             }
@@ -77,7 +78,7 @@ data class Customer(
 
     private fun changeCustomerEmail(cmd: ChangeCustomerEmail): CustomerEmailAddressChanged {
         return with(cmd) {
-            CustomerEmailAddressChanged(id, confirmationHash)
+            CustomerEmailAddressChanged(id, email, confirmationHash)
         }
     }
 
