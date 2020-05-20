@@ -25,3 +25,7 @@ class CustomerEmailAddressChanged(
         val id: CustomerId,
         val email: Email,
         val confirmationHash: ConfirmationHash): CustomerEvent
+
+class CustomerNameChanged(
+        val id: CustomerId,
+        val name: Name): CustomerEvent

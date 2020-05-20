@@ -49,6 +49,11 @@ data class Customer(
                 lastConfirmationHash = event.confirmationHash
                 if (shouldAddEvent) events.add(event)
             }
+            is CustomerNameChanged     -> {
+                state = CustomerState.UNCONFIRMED
+                name = event.name
+                if (shouldAddEvent) events.add(event)
+            }
         }
     }
 
@@ -57,6 +62,7 @@ data class Customer(
             is RegisterCustomer     -> registerCustomer(command).let(::record)
             is ConfirmCustomerEmail -> confirmCustomerEmail(command).value.let(::record)
             is ChangeCustomerEmail  -> changeCustomerEmail(command).let(::record)
+            is ChangeCustomerName  -> changeCustomerName(command).let(::record)
         }
     }
 
@@ -79,6 +85,12 @@ data class Customer(
     private fun changeCustomerEmail(cmd: ChangeCustomerEmail): CustomerEmailAddressChanged {
         return with(cmd) {
             CustomerEmailAddressChanged(id, email, confirmationHash)
+        }
+    }
+
+    private fun changeCustomerName(cmd: ChangeCustomerName): CustomerNameChanged {
+        return with(cmd) {
+            CustomerNameChanged(id, name)
         }
     }
 

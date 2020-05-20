@@ -136,4 +136,19 @@ class CustomerTest {
         val result = testling.notYetPersistedEvents.filterIsInstance<CustomerEmailConfirmed>().last()
         assertThat(result.confirmationHash).isEqualTo(newHash)
     }
+
+    @Test
+    fun `Customer can change his name`() {
+        val I = I()
+        // given
+        val testling = I.haveA.customer()
+        val cmd = I.wantTo.changeCustomerName()
+
+        // when
+        testling.handle(cmd)
+
+        // then
+        val result = testling.notYetPersistedEvents.filterIsInstance<CustomerNameChanged>().last()
+        assertThat(result.name).isEqualTo(cmd.name)
+    }
 }

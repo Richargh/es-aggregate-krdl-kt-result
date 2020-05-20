@@ -21,3 +21,7 @@ class ChangeCustomerEmail(
         val id: CustomerId,
         val confirmationHash: ConfirmationHash,
         val email: Email): CustomerCommand
+
+class ChangeCustomerName(
+        val id: CustomerId,
+        val name: Name): CustomerCommand
