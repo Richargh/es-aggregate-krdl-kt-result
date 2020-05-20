@@ -21,9 +21,9 @@ class Customer private constructor(initialEvents: List<CustomerEvent>): Aggregat
     }
 
     companion object {
-        fun register(vararg commands: CustomerCommand): Customer {
+        fun register(command: RegisterCustomer): Customer {
             val customer = Customer(emptyList())
-            commands.forEach(customer::handle)
+            customer.handle(command)
             return customer
         }
     }
