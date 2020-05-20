@@ -18,11 +18,11 @@ class CustomerBuilder(customerBuilderContext: CustomerBuilderContext) {
 
     fun makeConfirmed(confirmationHash: ConfirmationHash = ConfirmationHash("bkla")) = apply {
         this.events = listOf(
-                CustomerRegistered(id, name, email, confirmationHash),
+                CustomerRegistered(id, confirmationHash, name, email),
                 CustomerEmailConfirmed(id, confirmationHash))
     }
     fun makeUnConfirmed(confirmationHash: ConfirmationHash) = apply {
         this.events = listOf(
-                CustomerRegistered(id, name, email, confirmationHash))
+                CustomerRegistered(id, confirmationHash, name, email))
     }
 }

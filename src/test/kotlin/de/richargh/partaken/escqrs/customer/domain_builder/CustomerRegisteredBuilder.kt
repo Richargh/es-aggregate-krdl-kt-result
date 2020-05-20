@@ -15,7 +15,7 @@ class CustomerRegisteredBuilder(customerBuilderContext: CustomerBuilderContext) 
 
     fun build() = CustomerRegistered(
             id,
+            confirmationHash,
             name,
-            email,
-            confirmationHash)
+            email)
 }

@@ -9,9 +9,9 @@ interface CustomerEvent: Event
 
 class CustomerRegistered(
         val id: CustomerId,
+        val confirmationHash: ConfirmationHash,
         val name: Name,
-        val email: Email,
-        val confirmationHash: ConfirmationHash): CustomerEvent
+        val email: Email): CustomerEvent
 
 class CustomerEmailConfirmed(
         val id: CustomerId,
@@ -23,8 +23,8 @@ class CustomerEmailConfirmationFailed(
 
 class CustomerEmailAddressChanged(
         val id: CustomerId,
-        val email: Email,
-        val confirmationHash: ConfirmationHash): CustomerEvent
+        val confirmationHash: ConfirmationHash,
+        val email: Email): CustomerEvent
 
 class CustomerNameChanged(
         val id: CustomerId,

@@ -68,7 +68,7 @@ data class Customer(
 
     private fun registerCustomer(cmd: RegisterCustomer): CustomerRegistered {
         return with(cmd) {
-            CustomerRegistered(id, name, email, confirmationHash)
+            CustomerRegistered(id, confirmationHash, name, email)
         }
     }
 
@@ -84,7 +84,7 @@ data class Customer(
 
     private fun changeCustomerEmail(cmd: ChangeCustomerEmail): CustomerEmailAddressChanged {
         return with(cmd) {
-            CustomerEmailAddressChanged(id, email, confirmationHash)
+            CustomerEmailAddressChanged(id, confirmationHash, email)
         }
     }
 
