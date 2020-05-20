@@ -1,1 +1,1 @@
-rootProject.name = "es-cqrs"
+rootProject.name = "es-aggregate"
