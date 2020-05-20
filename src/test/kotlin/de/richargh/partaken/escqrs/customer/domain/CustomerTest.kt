@@ -32,4 +32,19 @@ class CustomerTest {
         val customerRegistered = testling.recordedEvents.filterIsInstance(CustomerRegistered::class.java).first()
         assertThat(customerRegistered.email).isEqualTo(cmd.email)
     }
+
+    @Test
+    fun `CustomerRegistered should contain registered confirmation hash`() {
+        val I = I()
+        // given
+        val cmd = I.wantTo.registerCustomer()
+
+        // when
+        val testling = Customer.register(cmd)
+
+        // then
+        val customerRegistered = testling.recordedEvents.filterIsInstance(CustomerRegistered::class.java).first()
+        assertThat(customerRegistered.confirmationHash).isEqualTo(cmd.confirmationHash)
+    }
+
 }

@@ -31,7 +31,7 @@ data class Customer private constructor(override val id: CustomerId): Aggregate 
 
     private fun registerCustomer(cmd: RegisterCustomer): CustomerRegistered {
         return with(cmd){
-            CustomerRegistered(id, name, email)
+            CustomerRegistered(id, name, email, confirmationHash)
         }
     }
 
