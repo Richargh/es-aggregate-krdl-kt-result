@@ -20,24 +20,16 @@ class CustomerTest {
     }
 
     @Test
-    fun `CustomerRegistered should record CustomerRegistered`() {
+    fun `CustomerRegistered should contain registered eMailAddress`() {
         val I = I()
         // given
+        val cmd = I.wantTo.registerCustomer()
 
         // when
-        val testling = Customer.register(I.wantTo.registerCustomer())
+        val testling = Customer.register(cmd)
 
         // then
-//        assertThat(testling.recordedEvents.filterIsInstance(CustomerRegistered::class.java).single().id).
-    }
-
-    @Test
-    fun `CustomerRegistered should contain registered eMailAddress`() {
-        // given
-
-        // when
-
-        // then
-
+        val customerRegistered = testling.recordedEvents.filterIsInstance(CustomerRegistered::class.java).first()
+        assertThat(customerRegistered.email).isEqualTo(cmd.email)
     }
 }
