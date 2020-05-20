@@ -10,11 +10,13 @@ class RegisterCustomerBuilder(customerBuilderContext: CustomerBuilderContext) {
     private val id = customerBuilderContext.id.nextCustomerId()
     private val name = Name("Blubb")
     private val email = Email("foo@bar.de")
-    private val confirmationHash = ConfirmationHash("1234-5678-90")
+    private var confirmationHash = ConfirmationHash("1234-5678-90")
 
     fun build() = RegisterCustomer(
             id,
             name,
             email,
             confirmationHash)
+
+    fun withConfirmationHash(confirmationHash: ConfirmationHash) = apply { this.confirmationHash = confirmationHash }
 }
