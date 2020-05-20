@@ -1,10 +1,21 @@
-= Result of the ES CQRS Workshop I took part in
+= Result of Workshop "Implementing an Event-Sourced Aggregate"
 
 *Features*
 
-* Event Sourced Data
-* Read and Write Models
+* Internal state of a DDD Customer aggregate is represented with events
+* A truckload of `domain_builder` code
 
 == Usage
 
 * Build `./gradlew build`
+
+== Scenario
+
+A customer is modelled internally using Event Sourcing.
+
+A customer can
+
+* Register
+* Confirm her/his email
+* Change her/his email
+* Change her/his name
