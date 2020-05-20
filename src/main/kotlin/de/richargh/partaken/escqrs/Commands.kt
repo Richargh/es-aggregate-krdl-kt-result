@@ -7,5 +7,8 @@ interface Command
 
 interface CustomerCommand: Command
 
-class RegisterCustomer: CustomerCommand
+class RegisterCustomer(
+        val id: CustomerId,
+        val name: Name,
+        val email: Email): CustomerCommand
 

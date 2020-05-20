@@ -1,9 +1,12 @@
 package de.richargh.partaken.escqrs
 
-class Customer private constructor(initialEvents: List<CustomerEvent>): Aggregate {
+class Customer private constructor(
+        private val id: CustomerId,
+        private val name: Name,
+        private val email: Email,
+        initialEvents: List<CustomerEvent>): Aggregate {
 
     private val events: MutableList<CustomerEvent> = mutableListOf()
-
     val recordedEvents: List<CustomerEvent> get() = events
 
     init {
@@ -11,20 +14,20 @@ class Customer private constructor(initialEvents: List<CustomerEvent>): Aggregat
     }
 
     fun handle(command: CustomerCommand) {
-        when (command) {
-            is RegisterCustomer -> registerCustomer(command).let(events::add)
-        }
-    }
-
-    private fun registerCustomer(register: RegisterCustomer): CustomerRegistered {
-        return CustomerRegistered()
     }
 
     companion object {
-        fun register(command: RegisterCustomer): Customer {
-            val customer = Customer(emptyList())
-            customer.handle(command)
-            return customer
+        fun register(cmd: RegisterCustomer): Customer {
+            val event = registerCustomer(cmd)
+            return with(event){
+                Customer(id, name, email, listOf(event))
+            }
+        }
+
+        private fun registerCustomer(cmd: RegisterCustomer): CustomerRegistered {
+            return with(cmd){
+                CustomerRegistered(id, name, email)
+            }
         }
     }
 }

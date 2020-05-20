@@ -7,10 +7,11 @@ class CustomerTest {
 
     @Test
     fun `Aggregate should be created via factory method`() {
+        val I = I()
         // given
 
         // when
-        val testling = Customer.register(RegisterCustomer())
+        val testling = Customer.register(I.wantTo.registerCustomer())
 
         // then
         assertThat(testling.recordedEvents).hasSize(1)
@@ -19,12 +20,14 @@ class CustomerTest {
 
     @Test
     fun `CustomerRegistered should record CustomerRegistered`() {
+        val I = I()
         // given
 
         // when
+        val testling = Customer.register(I.wantTo.registerCustomer())
 
         // then
-
+//        assertThat(testling.recordedEvents.filterIsInstance(CustomerRegistered::class.java).single().id).
     }
 
     @Test

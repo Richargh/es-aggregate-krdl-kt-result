@@ -7,4 +7,7 @@ interface Event
 
 interface CustomerEvent: Event
 
-class CustomerRegistered: CustomerEvent
+class CustomerRegistered(
+        val id: CustomerId,
+        val name: Name,
+        val email: Email): CustomerEvent
