@@ -1,5 +1,13 @@
 package de.richargh.partaken.escqrs
 
-class Name(val rawValue: String)
+data class Name(val rawValue: String): ValueObject {
+    companion object{
+        val NULL = Name("NULL")
+    }
+}
 
-class Email(val rawValue: String)
+data class Email(val rawValue: String): ValueObject {
+    companion object{
+        val NULL = Email("NULL")
+    }
+}

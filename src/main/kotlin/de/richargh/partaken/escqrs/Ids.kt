@@ -1,5 +1,6 @@
 package de.richargh.partaken.escqrs
 
+/**
+ * Marker interface for ids.
+ */
 interface Id
-
-class CustomerId(val rawValue: String): Id

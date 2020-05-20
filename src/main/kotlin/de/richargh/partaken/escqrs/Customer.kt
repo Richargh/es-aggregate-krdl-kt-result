@@ -1,33 +1,42 @@
 package de.richargh.partaken.escqrs
 
-class Customer private constructor(
-        private val id: CustomerId,
-        private val name: Name,
-        private val email: Email,
-        initialEvents: List<CustomerEvent>): Aggregate {
+data class CustomerId(val rawValue: String): Id
+
+data class Customer private constructor(override val id: CustomerId): Aggregate {
 
     private val events: MutableList<CustomerEvent> = mutableListOf()
     val recordedEvents: List<CustomerEvent> get() = events
 
-    init {
-        initialEvents.forEach { events.add(it) }
+    private var name: Name = Name.NULL
+    private var email: Email = Email.NULL
+
+    fun apply(event: CustomerEvent) {
+        when(event){
+            is CustomerRegistered -> {
+                name = event.name
+                email = event.email
+            }
+        }
     }
 
     fun handle(command: CustomerCommand) {
+        when(command){
+            is RegisterCustomer -> registerCustomer(command).let(::apply)
+        }
+    }
+
+    private fun registerCustomer(cmd: RegisterCustomer): CustomerRegistered {
+        return with(cmd){
+            CustomerRegistered(id, name, email)
+        }
     }
 
     companion object {
         fun register(cmd: RegisterCustomer): Customer {
-            val event = registerCustomer(cmd)
-            return with(event){
-                Customer(id, name, email, listOf(event))
+            return Customer(cmd.id).apply {
+                handle(cmd)
             }
         }
 
-        private fun registerCustomer(cmd: RegisterCustomer): CustomerRegistered {
-            return with(cmd){
-                CustomerRegistered(id, name, email)
-            }
-        }
     }
 }
