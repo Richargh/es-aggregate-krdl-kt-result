@@ -19,3 +19,9 @@ A customer can
 * Confirm her/his email
 * Change her/his email
 * Change her/his name
+
+link:src/test/kotlin/de/richargh/partaken/escqrs/customer/domain/CustomerTest.kt[Customer Test Excerpt]:
+[source,kotlin]
+----
+include::src/test/kotlin/de/richargh/partaken/escqrs/customer/domain/CustomerTest.kt[tags=confirmRegisteredCustomer]
+----

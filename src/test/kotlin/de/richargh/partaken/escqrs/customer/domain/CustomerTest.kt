@@ -50,8 +50,9 @@ class CustomerTest {
         assertThat(result.confirmationHash).isEqualTo(cmd.confirmationHash)
     }
 
+    // tag::confirmRegisteredCustomer[]
     @Test
-    fun `CustomerRegistered can be confirmed with the right hash`() {
+    fun `Unconfirmed Customer can be confirmed with the right hash`() {
         val I = I()
         // given
         val rightHash = ConfirmationHash("right")
@@ -65,9 +66,10 @@ class CustomerTest {
         val result = testling.notYetPersistedEvents.filterIsInstance<CustomerEmailConfirmed>().firstOrNull()
         assertThat(result).isNotNull
     }
+    // end::confirmRegisteredCustomer[]
 
     @Test
-    fun `CustomerRegistered cant be confirmed without the right hash`() {
+    fun `Unconfirmed Customer cant be confirmed without the right hash`() {
         val I = I()
         // given
         val rightHash = ConfirmationHash("right")
