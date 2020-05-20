@@ -1,13 +1,13 @@
 package de.richargh.partaken.escqrs
 
-class Customer private constructor(initialEvents: List<CustomerEvent>) {
+class Customer private constructor(initialEvents: List<CustomerEvent>): Aggregate {
 
     private val events: MutableList<CustomerEvent> = mutableListOf()
 
     val recordedEvents: List<CustomerEvent> get() = events
 
     init {
-        initialEvents.forEach {events.add(it) }
+        initialEvents.forEach { events.add(it) }
     }
 
     fun handle(command: CustomerCommand) {
