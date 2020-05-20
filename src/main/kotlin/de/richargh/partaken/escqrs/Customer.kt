@@ -12,8 +12,12 @@ class Customer private constructor(initialEvents: List<CustomerEvent>): Aggregat
 
     fun handle(command: CustomerCommand) {
         when (command) {
-            is RegisterCustomer -> events.add(CustomerRegistered())
+            is RegisterCustomer -> registerCustomer(command).let(events::add)
         }
+    }
+
+    private fun registerCustomer(register: RegisterCustomer): CustomerRegistered {
+        return CustomerRegistered()
     }
 
     companion object {
