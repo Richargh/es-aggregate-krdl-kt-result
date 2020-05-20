@@ -1,1 +1,1 @@
-rootProject.name = "cornado"
+rootProject.name = "es-cqrs"
