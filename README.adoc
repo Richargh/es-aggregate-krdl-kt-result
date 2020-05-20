@@ -1,0 +1,10 @@
+= Partaken ES CQRS Workshop
+
+*Features*
+
+* Event Sourced Data
+* Read and Write Models
+
+== Usage
+
+* Build `./gradlew build`
