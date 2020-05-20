@@ -1,4 +1,4 @@
-= Partaken ES CQRS Workshop
+= Result of the ES CQRS Workshop I took part in
 
 *Features*
 
