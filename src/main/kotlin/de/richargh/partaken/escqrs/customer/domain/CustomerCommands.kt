@@ -5,23 +5,23 @@ import de.richargh.partaken.escqrs.basictypes.domain.ConfirmationHash
 import de.richargh.partaken.escqrs.basictypes.domain.Email
 import de.richargh.partaken.escqrs.basictypes.domain.Name
 
-interface CustomerCommand: Command
+sealed class CustomerCommand: Command
 
 class RegisterCustomer(
         val id: CustomerId,
         val name: Name,
         val email: Email,
-        val confirmationHash: ConfirmationHash): CustomerCommand
+        val confirmationHash: ConfirmationHash): CustomerCommand()
 
 class ConfirmCustomerEmail(
         val id: CustomerId,
-        val confirmationHash: ConfirmationHash): CustomerCommand
+        val confirmationHash: ConfirmationHash): CustomerCommand()
 
 class ChangeCustomerEmail(
         val id: CustomerId,
         val confirmationHash: ConfirmationHash,
-        val email: Email): CustomerCommand
+        val email: Email): CustomerCommand()
 
 class ChangeCustomerName(
         val id: CustomerId,
-        val name: Name): CustomerCommand
+        val name: Name): CustomerCommand()

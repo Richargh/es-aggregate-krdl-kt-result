@@ -21,77 +21,62 @@ data class Customer(
     private var email: Email = Email.NULL
     private var lastConfirmationHash: ConfirmationHash? = null
 
+    fun handle(command: CustomerCommand) {
+        val event = when (command) {
+            is RegisterCustomer     -> with(command) {
+                CustomerRegistered(id, confirmationHash, name, email)
+            }
+            is ConfirmCustomerEmail -> with(command) {
+                if (confirmationHash == lastConfirmationHash)
+                    RelatedOutcome.Ok(CustomerEmailConfirmed(id, confirmationHash))
+                else
+                    RelatedOutcome.Fail(CustomerEmailConfirmationFailed(id, confirmationHash))
+            }.value
+            is ChangeCustomerEmail  -> with(command) {
+                CustomerEmailAddressChanged(id, confirmationHash, email)
+            }
+            is ChangeCustomerName   -> with(command) {
+                CustomerNameChanged(id, name)
+            }
+        }
+        applyAndRecord(event)
+    }
+
     fun reconstitute(events: List<CustomerEvent>) {
         events.forEach(::reconstitute)
     }
 
-    private fun reconstitute(event: CustomerEvent) = apply(event, false)
-    private fun record(event: CustomerEvent) = apply(event, true)
-    private fun apply(event: CustomerEvent, shouldAddEvent: Boolean) {
-        when (event) {
+    private fun reconstitute(event: CustomerEvent) = apply(event, shouldRecord = false)
+    private fun applyAndRecord(event: CustomerEvent) = apply(event, shouldRecord = true)
+    private fun apply(event: CustomerEvent, shouldRecord: Boolean) {
+        val knownEvent: CustomerEvent = when (event) {
             is CustomerRegistered              -> {
                 name = event.name
                 email = event.email
                 lastConfirmationHash = event.confirmationHash
-                if (shouldAddEvent) events.add(event)
+                event
             }
             is CustomerEmailConfirmed          -> {
                 state = CustomerState.CONFIRMED
                 lastConfirmationHash = null
-                if (shouldAddEvent) events.add(event)
+                event
             }
             is CustomerEmailConfirmationFailed -> {
-                if (shouldAddEvent) events.add(event)
+                event
             }
             is CustomerEmailAddressChanged     -> {
                 state = CustomerState.UNCONFIRMED
                 email = event.email
                 lastConfirmationHash = event.confirmationHash
-                if (shouldAddEvent) events.add(event)
+                event
             }
-            is CustomerNameChanged     -> {
+            is CustomerNameChanged             -> {
                 state = CustomerState.UNCONFIRMED
                 name = event.name
-                if (shouldAddEvent) events.add(event)
+                event
             }
         }
-    }
-
-    fun handle(command: CustomerCommand) {
-        when (command) {
-            is RegisterCustomer     -> registerCustomer(command).let(::record)
-            is ConfirmCustomerEmail -> confirmCustomerEmail(command).value.let(::record)
-            is ChangeCustomerEmail  -> changeCustomerEmail(command).let(::record)
-            is ChangeCustomerName  -> changeCustomerName(command).let(::record)
-        }
-    }
-
-    private fun registerCustomer(cmd: RegisterCustomer): CustomerRegistered {
-        return with(cmd) {
-            CustomerRegistered(id, confirmationHash, name, email)
-        }
-    }
-
-    private fun confirmCustomerEmail(
-            cmd: ConfirmCustomerEmail): RelatedOutcome<CustomerEmailConfirmed, CustomerEmailConfirmationFailed, CustomerEvent> {
-        return with(cmd) {
-            if (confirmationHash == lastConfirmationHash)
-                RelatedOutcome.Ok(CustomerEmailConfirmed(id, confirmationHash))
-            else
-                RelatedOutcome.Fail(CustomerEmailConfirmationFailed(id, confirmationHash))
-        }
-    }
-
-    private fun changeCustomerEmail(cmd: ChangeCustomerEmail): CustomerEmailAddressChanged {
-        return with(cmd) {
-            CustomerEmailAddressChanged(id, confirmationHash, email)
-        }
-    }
-
-    private fun changeCustomerName(cmd: ChangeCustomerName): CustomerNameChanged {
-        return with(cmd) {
-            CustomerNameChanged(id, name)
-        }
+        if (shouldRecord) events.add(knownEvent)
     }
 
     companion object {
